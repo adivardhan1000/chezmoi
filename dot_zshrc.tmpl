@@ -1,0 +1,31 @@
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+
+plugins=(git zsh-autosuggestions)
+
+source $ZSH/oh-my-zsh.sh
+
+# Added by Antigravity IDE
+export PATH="{{ .chezmoi.homeDir }}/.antigravity-ide/antigravity-ide/bin:$PATH"
+
+# Added path for Bitwarden
+export SSH_AUTH_SOCK={{ .chezmoi.homeDir }}/.bitwarden-ssh-agent.sock
+
+# Wrapper to automatically track Homebrew changes in chezmoi
+brew() {
+  command brew "$@"
+  
+  local update_brewfile=false
+  for arg in "$@"; do
+    case "$arg" in
+      install|uninstall|tap|untap)
+        update_brewfile=true
+        ;;
+    esac
+  done
+  
+  if [ "$update_brewfile" = true ]; then
+    echo "Updating Brewfile in chezmoi source..."
+    command brew bundle dump --force --file="{{ .chezmoi.sourceDir }}/dot_Brewfile"
+  fi
+}

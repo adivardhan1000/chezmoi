@@ -1,0 +1,6 @@
+{{- $username := promptStringOnce . "username" "What is your username" "adi" -}}
+
+[data]
+    username = {{ $username | quote }}
+    profile = "personal"
+    os = "mac"
