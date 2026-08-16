@@ -104,29 +104,27 @@ defaults write org.p0deje.Maccy windowSize -string "[450,800]"
 defaults write com.lwouis.alt-tab-macos updatePolicy -int 1
 
 # --- Loop (Window Manager) ---
-# Trigger key: ⌘+Option (keycodes 58=Option, 55=⌘)
-defaults write com.MrKai77.Loop trigger -array 58 55
+# Import bindings from loop_bindings.json
+if [ -f "{{ .chezmoi.sourceDir }}/loop_bindings.json" ]; then
+    echo "Importing Loop keybindings..."
+    python3 - "{{ .chezmoi.sourceDir }}/loop_bindings.json" << 'EOF'
+import json, sys, subprocess
 
-# Custom keybinds:
-# Space → cycle: Center 50%, AlmostMaximize, Maximize
-# ↑ → cycle: TopHalf, TopThird, TopTwoThirds
-# ↓ → cycle: BottomHalf, BottomThird, BottomTwoThirds
-# → → cycle: RightHalf, RightThird, RightTwoThirds
-# ← → cycle: LeftHalf, LeftThird, LeftTwoThirds
-# ↑← → TopLeftQuarter
-# ↑→ → TopRightQuarter
-# ↓→ → BottomRightQuarter
-# ←↓ → BottomLeftQuarter
-defaults write com.MrKai77.Loop keybinds -array \
-  "'{\"cycle\":[{\"anchor\":8,\"direction\":\"Custom\",\"height\":50,\"id\":\"3283009C-3842-4D3C-BB5F-D0036B3CB6DA\",\"keybind\":[],\"name\":\"Center 50\",\"positionMode\":0,\"sizeMode\":0,\"unit\":1,\"width\":50},{\"direction\":\"AlmostMaximize\",\"id\":\"9EFA26F0-C07C-4EBB-8D58-70C3EFCA120F\",\"keybind\":[]},{\"direction\":\"Maximize\",\"id\":\"8867F0AC-3EB7-4FBC-9C3B-2691A2D35053\",\"keybind\":[]}],\"direction\":\"Cycle\",\"id\":\"BD69466B-16F5-4AFF-82B2-BD20BEA36FFA\",\"keybind\":[49],\"name\":\"\"}'" \
-  "'{\"cycle\":[{\"direction\":\"TopHalf\",\"id\":\"2F05572A-D59F-432E-8DBF-5D14DC1A30A0\",\"keybind\":[]},{\"direction\":\"TopThird\",\"id\":\"181F26D5-06B4-464E-BB70-187223E8CBAE\",\"keybind\":[]},{\"direction\":\"TopTwoThirds\",\"id\":\"7E730B7A-8617-45E9-AD8F-828EFAA11C35\",\"keybind\":[]}],\"direction\":\"Cycle\",\"id\":\"5F408074-2BA3-4F63-8642-10D3B0894544\",\"keybind\":[126],\"name\":\"Top Cycle\"}'" \
-  "'{\"cycle\":[{\"direction\":\"BottomHalf\",\"id\":\"A8375689-E0C8-4885-B0CC-03581C92D610\",\"keybind\":[]},{\"direction\":\"BottomThird\",\"id\":\"9325875A-2378-49EB-A9D0-793DA157DD02\",\"keybind\":[]},{\"direction\":\"BottomTwoThirds\",\"id\":\"7DCB37BD-72F1-4B9E-B2FA-9DD4A05ED0F2\",\"keybind\":[]}],\"direction\":\"Cycle\",\"id\":\"B4500AF0-EF6C-483C-8104-41979BCEEE18\",\"keybind\":[125],\"name\":\"Bottom Cycle\"}'" \
-  "'{\"cycle\":[{\"direction\":\"RightHalf\",\"id\":\"66BD385A-EAB8-4A4F-9B1B-888D6A214CD8\",\"keybind\":[]},{\"direction\":\"RightThird\",\"id\":\"2176FB27-3FC9-4DA9-90F4-2F1F1938FE5C\",\"keybind\":[]},{\"direction\":\"RightTwoThirds\",\"id\":\"DEE82BC9-5322-4A32-B705-22495168422A\",\"keybind\":[]}],\"direction\":\"Cycle\",\"id\":\"0A9EA748-2E9A-4510-A05F-D2E25C7E4E3B\",\"keybind\":[124],\"name\":\"Right Cycle\"}'" \
-  "'{\"cycle\":[{\"direction\":\"LeftHalf\",\"id\":\"AA7DDAC0-A218-4486-8013-52F7FCFC163E\",\"keybind\":[]},{\"direction\":\"LeftThird\",\"id\":\"0A426B2F-2C67-45EA-824A-CEB0FF8EE86A\",\"keybind\":[]},{\"direction\":\"LeftTwoThirds\",\"id\":\"A7699B9F-EF8D-41B2-BD33-2ED0119245E4\",\"keybind\":[]}],\"direction\":\"Cycle\",\"id\":\"EA82E4D8-8000-4D41-91FC-C8397535EE0D\",\"keybind\":[123],\"name\":\"Left Cycle\"}'" \
-  "'{\"direction\":\"TopLeftQuarter\",\"id\":\"8939F2C0-81DC-4A9B-A2D0-B8E277220749\",\"keybind\":[126,123]}'" \
-  "'{\"direction\":\"TopRightQuarter\",\"id\":\"F8D095C1-EC00-432F-A71A-FD5F4B0C4A52\",\"keybind\":[124,126]}'" \
-  "'{\"direction\":\"BottomRightQuarter\",\"id\":\"E6F98974-4B66-4F4F-AB63-23FE5D13E9BF\",\"keybind\":[125,124]}'" \
-  "'{\"direction\":\"BottomLeftQuarter\",\"id\":\"609D4AD8-3815-4FED-866F-BDD4802C6070\",\"keybind\":[123,125]}'"
+with open(sys.argv[1], "r") as f:
+    data = json.load(f)
+
+if "triggerKey" in data:
+    trigger = list(map(str, data["triggerKey"]))
+    subprocess.run(["defaults", "write", "com.MrKai77.Loop", "trigger", "-array"] + trigger)
+
+if "actions" in data:
+    args = ["defaults", "write", "com.MrKai77.Loop", "keybinds", "-array"]
+    for action in data["actions"]:
+        action_json = f"'{json.dumps(action, separators=(',', ':'))}'"
+        args.append(action_json)
+    subprocess.run(args)
+EOF
+fi
 
 # ────────────────────────────────────────────────────────────
 # Restart affected services to apply changes
