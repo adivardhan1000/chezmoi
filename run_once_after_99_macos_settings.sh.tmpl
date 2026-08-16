@@ -36,6 +36,19 @@ defaults write com.apple.dock tilesize -int 52
 # Don't show recent apps in the Dock
 defaults write com.apple.dock show-recents -bool false
 
+# Set exact pinned apps using dockutil
+if command -v dockutil &> /dev/null; then
+    echo "Configuring Dock pinned apps..."
+    dockutil --no-restart --remove all
+    dockutil --no-restart --add '/System/Applications/Apps.app'
+    dockutil --no-restart --add '/System/Applications/Calendar.app'
+    dockutil --no-restart --add '/System/Applications/Notes.app'
+    dockutil --no-restart --add '/System/Applications/System Settings.app'
+    dockutil --no-restart --add '/Applications/Firefox.app' || true
+else
+    echo "Warning: dockutil is not installed, skipping Dock app pinning."
+fi
+
 # ────────────────────────────────────────────────────────────
 # Finder
 # ────────────────────────────────────────────────────────────

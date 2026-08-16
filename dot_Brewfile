@@ -1,5 +1,7 @@
 # Manage your dotfiles across multiple diverse machines, securely
 brew "chezmoi"
+# CLI utility for managing macOS Dock items
+brew "dockutil"
 # Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-autosuggestions"
 # Enable Windows-like alt-tab
