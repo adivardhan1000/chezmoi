@@ -3,9 +3,11 @@
 
 set -e
 
+# ────────────────────────────────────────────────────────────
 # Remove pre-installed Apple apps you don't want.
 # Note: `sudo` will prompt for your password during `chezmoi apply`,
 # so this script is not fully unattended.
+# ────────────────────────────────────────────────────────────
 apps_to_remove=(
     "iMovie"
     "GarageBand"
@@ -21,7 +23,103 @@ for app in "${apps_to_remove[@]}"; do
     fi
 done
 
-# Example: uncomment to tweak macOS defaults, e.g.
-# defaults write com.apple.dock autohide -bool true
-# killall Dock
+# ────────────────────────────────────────────────────────────
+# Dock
+# ────────────────────────────────────────────────────────────
+
+# Auto-hide the Dock
+defaults write com.apple.dock autohide -bool true
+
+# Icon size (default: 48)
+defaults write com.apple.dock tilesize -int 52
+
+# Don't show recent apps in the Dock
+defaults write com.apple.dock show-recents -bool false
+
+# ────────────────────────────────────────────────────────────
+# Finder
+# ────────────────────────────────────────────────────────────
+
+# Show path bar at the bottom of Finder windows
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Default to List view in Finder windows
+# Four-letter codes: `icnv`, `clmv`, `glyv`, `Nlsv`
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# ────────────────────────────────────────────────────────────
+# Screenshots
+# ────────────────────────────────────────────────────────────
+
+# Save screenshots to ~/Documents instead of ~/Desktop
+defaults write com.apple.screencapture location -string "${HOME}/Documents"
+
+# ────────────────────────────────────────────────────────────
+# Window Manager (Stage Manager / tiling)
+# ────────────────────────────────────────────────────────────
+
+# Disable margins around tiled windows
+defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false
+
+# Click wallpaper to reveal desktop → only in Stage Manager
+defaults write com.apple.WindowManager HideDesktop -bool true
+
+# ────────────────────────────────────────────────────────────
+# Third-Party App Preferences
+# ────────────────────────────────────────────────────────────
+
+# --- Maccy (Clipboard Manager) ---
+# Popup shortcut: ⌘+Shift+V  (carbonKeyCode 9 = V, carbonModifiers 2304 = ⌘+Shift)
+defaults write org.p0deje.Maccy KeyboardShortcuts_popup -string '{"carbonKeyCode":9,"carbonModifiers":2304}'
+# Disable unneeded shortcuts
+defaults write org.p0deje.Maccy KeyboardShortcuts_delete -bool false
+defaults write org.p0deje.Maccy KeyboardShortcuts_pin -bool false
+defaults write org.p0deje.Maccy KeyboardShortcuts_togglePreview -bool false
+# Hide menu bar icon
+defaults write org.p0deje.Maccy "NSStatusItem VisibleCC Item-1" -bool false
+# Show title, search bar, and footer
+defaults write org.p0deje.Maccy showTitle -bool true
+defaults write org.p0deje.Maccy showSearch -bool true
+defaults write org.p0deje.Maccy showFooter -bool true
+# Preview width
+defaults write org.p0deje.Maccy previewWidth -float 400
+# Window size
+defaults write org.p0deje.Maccy windowSize -string "[450,800]"
+
+# --- Alt-Tab ---
+# Update policy: 1 = check but don't auto-install
+defaults write com.lwouis.alt-tab-macos updatePolicy -int 1
+
+# --- Loop (Window Manager) ---
+# Trigger key: ⌘+Option (keycodes 58=Option, 55=⌘)
+defaults write com.MrKai77.Loop trigger -array 58 55
+
+# Custom keybinds:
+# Space → cycle: Center 50%, AlmostMaximize, Maximize
+# ↑ → cycle: TopHalf, TopThird, TopTwoThirds
+# ↓ → cycle: BottomHalf, BottomThird, BottomTwoThirds
+# → → cycle: RightHalf, RightThird, RightTwoThirds
+# ← → cycle: LeftHalf, LeftThird, LeftTwoThirds
+# ↑← → TopLeftQuarter
+# ↑→ → TopRightQuarter
+# ↓→ → BottomRightQuarter
+# ←↓ → BottomLeftQuarter
+defaults write com.MrKai77.Loop keybinds -array \
+  '{"cycle":[{"anchor":8,"direction":"Custom","height":50,"id":"3283009C-3842-4D3C-BB5F-D0036B3CB6DA","keybind":[],"name":"Center 50","positionMode":0,"sizeMode":0,"unit":1,"width":50},{"direction":"AlmostMaximize","id":"9EFA26F0-C07C-4EBB-8D58-70C3EFCA120F","keybind":[]},{"direction":"Maximize","id":"8867F0AC-3EB7-4FBC-9C3B-2691A2D35053","keybind":[]}],"direction":"Cycle","id":"BD69466B-16F5-4AFF-82B2-BD20BEA36FFA","keybind":[49],"name":""}' \
+  '{"cycle":[{"direction":"TopHalf","id":"2F05572A-D59F-432E-8DBF-5D14DC1A30A0","keybind":[]},{"direction":"TopThird","id":"181F26D5-06B4-464E-BB70-187223E8CBAE","keybind":[]},{"direction":"TopTwoThirds","id":"7E730B7A-8617-45E9-AD8F-828EFAA11C35","keybind":[]}],"direction":"Cycle","id":"5F408074-2BA3-4F63-8642-10D3B0894544","keybind":[126],"name":"Top Cycle"}' \
+  '{"cycle":[{"direction":"BottomHalf","id":"A8375689-E0C8-4885-B0CC-03581C92D610","keybind":[]},{"direction":"BottomThird","id":"9325875A-2378-49EB-A9D0-793DA157DD02","keybind":[]},{"direction":"BottomTwoThirds","id":"7DCB37BD-72F1-4B9E-B2FA-9DD4A05ED0F2","keybind":[]}],"direction":"Cycle","id":"B4500AF0-EF6C-483C-8104-41979BCEEE18","keybind":[125],"name":"Bottom Cycle"}' \
+  '{"cycle":[{"direction":"RightHalf","id":"66BD385A-EAB8-4A4F-9B1B-888D6A214CD8","keybind":[]},{"direction":"RightThird","id":"2176FB27-3FC9-4DA9-90F4-2F1F1938FE5C","keybind":[]},{"direction":"RightTwoThirds","id":"DEE82BC9-5322-4A32-B705-22495168422A","keybind":[]}],"direction":"Cycle","id":"0A9EA748-2E9A-4510-A05F-D2E25C7E4E3B","keybind":[124],"name":"Right Cycle"}' \
+  '{"cycle":[{"direction":"LeftHalf","id":"AA7DDAC0-A218-4486-8013-52F7FCFC163E","keybind":[]},{"direction":"LeftThird","id":"0A426B2F-2C67-45EA-824A-CEB0FF8EE86A","keybind":[]},{"direction":"LeftTwoThirds","id":"A7699B9F-EF8D-41B2-BD33-2ED0119245E4","keybind":[]}],"direction":"Cycle","id":"EA82E4D8-8000-4D41-91FC-C8397535EE0D","keybind":[123],"name":"Left Cycle"}' \
+  '{"direction":"TopLeftQuarter","id":"8939F2C0-81DC-4A9B-A2D0-B8E277220749","keybind":[126,123]}' \
+  '{"direction":"TopRightQuarter","id":"F8D095C1-EC00-432F-A71A-FD5F4B0C4A52","keybind":[124,126]}' \
+  '{"direction":"BottomRightQuarter","id":"E6F98974-4B66-4F4F-AB63-23FE5D13E9BF","keybind":[125,124]}' \
+  '{"direction":"BottomLeftQuarter","id":"609D4AD8-3815-4FED-866F-BDD4802C6070","keybind":[123,125]}'
+
+# ────────────────────────────────────────────────────────────
+# Restart affected services to apply changes
+# ────────────────────────────────────────────────────────────
+killall Dock 2>/dev/null || true
+killall Finder 2>/dev/null || true
+killall SystemUIServer 2>/dev/null || true
+
 {{ end -}}

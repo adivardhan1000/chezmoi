@@ -1,0 +1,9 @@
+[user]
+    name = adivardhan
+    email = hey@adivardhan.tech
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true

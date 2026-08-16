@@ -29,8 +29,9 @@ Files are named using chezmoi conventions. On `chezmoi apply`:
 | `run_once_before_00_install_prerequisites.sh.tmpl` | Installs Bitwarden first (SSH agent) before other steps. |
 | `run_onchange_before_10_install_packages.sh.tmpl` | Runs `brew bundle` + installs Oh My Zsh. Re-runs whenever `dot_Brewfile` changes. |
 | `dot_Brewfile` | The list of Homebrew formulae/casks to install (becomes `~/.Brewfile`). |
+| `dot_gitconfig.tmpl` | Git identity and LFS config (becomes `~/.gitconfig`). |
 | `dot_zshrc.tmpl` | Your `~/.zshrc` (Homebrew env, Oh My Zsh, plugins, brew auto-sync wrapper). |
-| `run_once_after_99_macos_settings.sh.tmpl` | Removes unwanted default apps; place for `defaults write` tweaks. |
+| `run_once_after_99_macos_settings.sh.tmpl` | Removes unwanted apps, sets macOS defaults, and configures third-party apps. |
 | `.chezmoiignore` | Files kept in the repo but not applied to `$HOME`. |
 
 Script run order: `before` scripts → files → `after` scripts, each in
@@ -55,6 +56,27 @@ chezmoi apply -v   # apply changes
 chezmoi cd         # open a shell in the source directory
 chezmoi update     # pull latest from git and apply
 ```
+
+## Managed macOS settings
+
+The `run_once_after_99_macos_settings.sh.tmpl` script applies these
+non-default settings on a fresh machine:
+
+| Area | Setting | Value |
+| --- | --- | --- |
+| **Dock** | Auto-hide | On |
+| | Icon size | 52 px |
+| | Show recent apps | Off |
+| **Finder** | Path bar | Shown |
+| | Default view | List |
+| **Screenshots** | Save location | `~/Documents/` |
+| **Window Manager** | Tiled window margins | Off |
+| | Click wallpaper to show desktop | On (Stage Manager only) |
+| **Maccy** | Popup shortcut | `⌘+Shift+V` |
+| | Menu bar icon | Hidden |
+| **Alt-Tab** | Update policy | Check only |
+| **Loop** | Trigger | `⌘+Option` |
+| | Keybinds | Directional halves/thirds/quarters |
 
 ## Customizing
 
