@@ -9,7 +9,7 @@ macOS tweaks — all reproducibly on a fresh machine.
 One-liner that installs Homebrew + chezmoi and applies this repo:
 
 ```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/adivardhan1000/chezmoi/main/initialize.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/adivardhan1000/dotFiles/main/initialize.sh)"
 ```
 
 Or, if you already have chezmoi:
