@@ -1,31 +1,42 @@
+# Load Homebrew into the shell environment (arch-aware).
+# Apple Silicon installs to /opt/homebrew; Intel to /usr/local.
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Oh My Zsh
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 
-plugins=(git zsh-autosuggestions)
+plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
+
+# zsh-autosuggestions (installed via Homebrew; see dot_Brewfile).
+# $HOMEBREW_PREFIX is exported by `brew shellenv` above.
+if [ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+  source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
 
 # Added by Antigravity IDE
 export PATH="{{ .chezmoi.homeDir }}/.antigravity-ide/antigravity-ide/bin:$PATH"
 
-# Added path for Bitwarden
-export SSH_AUTH_SOCK={{ .chezmoi.homeDir }}/.bitwarden-ssh-agent.sock
+# Added path for Bitwarden SSH agent
+export SSH_AUTH_SOCK="{{ .chezmoi.homeDir }}/.bitwarden-ssh-agent.sock"
 
-# Wrapper to automatically track Homebrew changes in chezmoi
+# Wrapper to automatically track Homebrew changes in chezmoi.
+# When a command changes installed packages, re-dump the Brewfile
+# into the chezmoi source directory so it stays in sync.
 brew() {
   command brew "$@"
-  
-  local update_brewfile=false
-  for arg in "$@"; do
-    case "$arg" in
-      install|uninstall|tap|untap)
-        update_brewfile=true
-        ;;
-    esac
-  done
-  
-  if [ "$update_brewfile" = true ]; then
-    echo "Updating Brewfile in chezmoi source..."
-    command brew bundle dump --force --file="{{ .chezmoi.sourceDir }}/dot_Brewfile"
-  fi
+
+  case "$1" in
+    install | uninstall | tap | untap)
+      echo "Updating Brewfile in chezmoi source..."
+      command brew bundle dump --describe --force \
+        --file="{{ .chezmoi.sourceDir }}/dot_Brewfile"
+      ;;
+  esac
 }

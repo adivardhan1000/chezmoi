@@ -1,11 +1,27 @@
+{{ if eq .chezmoi.os "darwin" -}}
 #!/usr/bin/env bash
 
 set -e
 
-if [ "$(uname)" = "Darwin" ]; then
-    sudo rm -rf /Applications/iMovie.app
-    sudo rm -rf /Applications/GarageBand.app
-    sudo rm -rf /Applications/Keynote.app
-    sudo rm -rf /Applications/Pages.app
-    sudo rm -rf /Applications/Numbers.app
-fi
+# Remove pre-installed Apple apps you don't want.
+# Note: `sudo` will prompt for your password during `chezmoi apply`,
+# so this script is not fully unattended.
+apps_to_remove=(
+    "iMovie"
+    "GarageBand"
+    "Keynote"
+    "Pages"
+    "Numbers"
+)
+
+for app in "${apps_to_remove[@]}"; do
+    if [ -d "/Applications/${app}.app" ]; then
+        echo "Removing ${app}.app..."
+        sudo rm -rf "/Applications/${app}.app"
+    fi
+done
+
+# Example: uncomment to tweak macOS defaults, e.g.
+# defaults write com.apple.dock autohide -bool true
+# killall Dock
+{{ end -}}

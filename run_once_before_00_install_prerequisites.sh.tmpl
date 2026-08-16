@@ -2,7 +2,9 @@
 
 set -e
 
-brew install --cask firefox bitwarden
+# Bitwarden is installed early because its built-in SSH agent may be needed
+# (e.g. for Git over SSH) before the full Brewfile is applied in a later step.
+# Other apps are handled by dot_Brewfile in run_onchange_before_10_install_packages.
+brew install --cask bitwarden
 
-echo "Please ensure Bitwarden SSH Agent is enabled."
-
+echo "Please ensure the Bitwarden SSH Agent is enabled (Settings → SSH agent)."

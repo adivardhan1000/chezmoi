@@ -1,0 +1,3 @@
+# Files that live in the repo but should NOT be copied into your home directory
+README.md
+initialize.sh

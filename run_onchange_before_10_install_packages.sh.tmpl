@@ -5,9 +5,9 @@ set -e
 
 brew bundle --file={{ joinPath .chezmoi.sourceDir "dot_Brewfile" | quote }}
 
-if [ ! -d "/Users/{{ .username }}/.oh-my-zsh" ]; then
-    export ZSH="/Users/{{ .username }}/.oh-my-zsh"
+if [ ! -d "{{ .chezmoi.homeDir }}/.oh-my-zsh" ]; then
+    export ZSH="{{ .chezmoi.homeDir }}/.oh-my-zsh"
     export RUNZSH="no"
     export CHSH="yes"
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi

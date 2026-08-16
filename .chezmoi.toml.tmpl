@@ -1,6 +1,9 @@
 {{- $username := promptStringOnce . "username" "What is your username" "adi" -}}
 
+# Values under [data] are available in templates as {{ printf "{{ .name }}" }}.
+# Note: chezmoi already provides built-ins like .chezmoi.username,
+# .chezmoi.homeDir and .chezmoi.os, so prefer those where possible.
+# "profile" is a free-form example you can branch on (e.g. personal vs work).
 [data]
     username = {{ $username | quote }}
     profile = "personal"
-    os = "mac"
